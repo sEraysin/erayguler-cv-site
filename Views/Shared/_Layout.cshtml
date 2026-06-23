@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Eray Güler blog ve portfolyo içerikleri." />
+    <title>@ViewData["Title"] | Eray Güler</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="public-blog-body">
+    <header class="blog-topbar">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand fw-bold" asp-controller="Default" asp-action="Index">Eray Güler</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Menüyü aç">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link" asp-controller="Default" asp-action="Index" asp-fragment="page-top">CV</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Default" asp-action="Index" asp-fragment="blog">Ana Sayfa Blog</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Blog" asp-action="Index">Tüm Yazılar</a></li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item"><a class="nav-link admin-nav-link" asp-controller="Admin" asp-action="Index">Admin Panelim</a></li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link admin-nav-link" asp-controller="Login" asp-action="Index">Admin Giriş</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <footer class="blog-footer">
+        <div class="container">&copy; @DateTime.Now.Year Eray Güler</div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

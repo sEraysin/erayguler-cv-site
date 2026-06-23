@@ -1,0 +1,35 @@
+@model List<BlogPost>
+@{
+    ViewData["Title"] = "Blog";
+}
+
+<section class="blog-hero">
+    <div class="container">
+        <span class="blog-eyebrow">Eray Güler Blog</span>
+        <h1>Backend, ASP.NET Core ve yazılım notları</h1>
+        <p>C#, EF Core, Identity, veritabanı tasarımı ve üretime hazır web uygulamaları üzerine kişisel notlar.</p>
+    </div>
+</section>
+
+<section class="blog-list-section">
+    <div class="container">
+        <div class="blog-grid">
+            @foreach (var blogPost in Model)
+            {
+                <article class="blog-card">
+                    <div class="blog-card-meta">
+                        <span>@((blogPost.PublishedAtUtc ?? blogPost.CreatedAtUtc).ToLocalTime().ToString("dd.MM.yyyy"))</span>
+                        <span>Backend</span>
+                    </div>
+                    <h2>
+                        <a asp-controller="Blog" asp-action="Details" asp-route-slug="@blogPost.Slug">@blogPost.Title</a>
+                    </h2>
+                    <p>@blogPost.Summary</p>
+                    <a class="blog-read-more" asp-controller="Blog" asp-action="Details" asp-route-slug="@blogPost.Slug">
+                        Yazıyı oku
+                    </a>
+                </article>
+            }
+        </div>
+    </div>
+</section>

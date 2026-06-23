@@ -1,0 +1,316 @@
+@model AdminDashboardViewModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Admin Paneli";
+}
+
+<section id="profile" class="card">
+    <div class="card-header"><h3 class="card-title">Hakkımda / Profil</h3></div>
+    <form asp-controller="Admin" asp-action="SaveProfile" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Profile.Id" name="Id" />
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 form-group"><label>Ad</label><input asp-for="Profile.FirstName" name="FirstName" class="form-control" required /></div>
+                <div class="col-md-3 form-group"><label>Soyad</label><input asp-for="Profile.LastName" name="LastName" class="form-control" required /></div>
+                <div class="col-md-6 form-group"><label>Ünvan</label><input asp-for="Profile.Title" name="Title" class="form-control" required /></div>
+                <div class="col-md-4 form-group"><label>Konum</label><input asp-for="Profile.Location" name="Location" class="form-control" required /></div>
+                <div class="col-md-4 form-group"><label>Telefon</label><input asp-for="Profile.Phone" name="Phone" class="form-control" required /></div>
+                <div class="col-md-4 form-group"><label>E-posta</label><input asp-for="Profile.Email" name="Email" class="form-control" required /></div>
+                <div class="col-md-4 form-group"><label>Dil</label><input asp-for="Profile.Language" name="Language" class="form-control" /></div>
+                <div class="col-md-8 form-group"><label>Profil Fotoğrafı URL</label><input asp-for="Profile.ImageUrl" name="ImageUrl" class="form-control" required /></div>
+                <div class="col-12 form-group"><label>Hakkımda Metni</label><textarea asp-for="Profile.About" name="About" class="form-control" rows="5" required></textarea></div>
+            </div>
+        </div>
+        <div class="card-footer"><button type="submit" class="btn btn-primary">Profili Kaydet</button></div>
+    </form>
+</section>
+
+<section id="cv-file" class="card">
+    <div class="card-header"><h3 class="card-title">CV Dosyası</h3></div>
+    <form asp-controller="Admin" asp-action="UploadCv" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div class="card-body">
+            <label>Yeni CV Yükle</label>
+            <input type="file" name="cvFile" class="form-control" accept=".pdf,.doc,.docx" required />
+            <small class="form-text text-muted">PDF, DOC veya DOCX yükleyebilirsin. Yeni dosya eskisinin yerine geçer.</small>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary">CV'yi Güncelle</button>
+            <a asp-controller="Default" asp-action="DownloadCv" asp-route-v="@DateTimeOffset.UtcNow.ToUnixTimeSeconds()" class="btn btn-outline-secondary">Mevcut CV'yi İndir</a>
+        </div>
+    </form>
+</section>
+
+<section id="education" class="card">
+    <div class="card-header"><h3 class="card-title">Eğitim</h3></div>
+    <div class="card-body">
+        <form asp-controller="Admin" asp-action="SaveEducation" method="post" class="admin-inline-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Id" value="0" />
+            <input name="School" class="form-control" placeholder="Okul" required />
+            <input name="Degree" class="form-control" placeholder="Derece" required />
+            <input name="Field" class="form-control" placeholder="Bölüm" />
+            <input name="Grade" class="form-control" placeholder="GNO" />
+            <input name="DateRange" class="form-control" placeholder="Tarih" required />
+            <input name="DisplayOrder" type="number" class="form-control" placeholder="Sıra" value="1" />
+            <textarea name="Description" class="form-control" placeholder="Açıklama"></textarea>
+            <button class="btn btn-success" type="submit">Yeni Eğitim Ekle</button>
+        </form>
+        @foreach (var education in Model.Educations)
+        {
+            <form asp-controller="Admin" asp-action="SaveEducation" method="post" class="admin-edit-card">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" value="@education.Id" />
+                <input name="School" class="form-control" value="@education.School" required />
+                <input name="Degree" class="form-control" value="@education.Degree" required />
+                <input name="Field" class="form-control" value="@education.Field" />
+                <input name="Grade" class="form-control" value="@education.Grade" placeholder="GNO" />
+                <input name="DateRange" class="form-control" value="@education.DateRange" required />
+                <input name="DisplayOrder" type="number" class="form-control" value="@education.DisplayOrder" />
+                <textarea name="Description" class="form-control">@education.Description</textarea>
+                <button class="btn btn-primary" type="submit">Kaydet</button>
+                <button type="submit" class="btn btn-danger" formaction="@Url.Action("DeleteEducation", "Admin", new { id = education.Id })" formmethod="post" formnovalidate>Sil</button>
+            </form>
+        }
+    </div>
+</section>
+
+<section id="experience" class="card">
+    <div class="card-header"><h3 class="card-title">Deneyim</h3></div>
+    <div class="card-body">
+        <form asp-controller="Admin" asp-action="SaveExperience" method="post" class="admin-inline-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Id" value="0" />
+            <input name="Title" class="form-control" placeholder="Başlık" required />
+            <input name="Company" class="form-control" placeholder="Kurum" required />
+            <input name="DateRange" class="form-control" placeholder="Tarih" required />
+            <input name="DisplayOrder" type="number" class="form-control" placeholder="Sıra" value="1" />
+            <textarea name="Description" class="form-control" placeholder="Açıklama" required></textarea>
+            <button class="btn btn-success" type="submit">Yeni Deneyim Ekle</button>
+        </form>
+        @foreach (var experience in Model.Experiences)
+        {
+            <form asp-controller="Admin" asp-action="SaveExperience" method="post" class="admin-edit-card">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" value="@experience.Id" />
+                <input name="Title" class="form-control" value="@experience.Title" required />
+                <input name="Company" class="form-control" value="@experience.Company" required />
+                <input name="DateRange" class="form-control" value="@experience.DateRange" required />
+                <input name="DisplayOrder" type="number" class="form-control" value="@experience.DisplayOrder" />
+                <textarea name="Description" class="form-control" required>@experience.Description</textarea>
+                <button class="btn btn-primary" type="submit">Kaydet</button>
+                <button type="submit" class="btn btn-danger" formaction="@Url.Action("DeleteExperience", "Admin", new { id = experience.Id })" formmethod="post" formnovalidate>Sil</button>
+            </form>
+        }
+    </div>
+</section>
+
+<section id="skills" class="card">
+    <div class="card-header"><h3 class="card-title">Yetenekler</h3></div>
+    <div class="card-body">
+        <form asp-controller="Admin" asp-action="SaveSkill" method="post" class="admin-inline-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Id" value="0" />
+            <input name="Name" class="form-control" placeholder="Yetenek" required />
+            <input name="Category" class="form-control" placeholder="Kategori" required />
+            <input name="Level" type="number" min="0" max="100" class="form-control" placeholder="Seviye" value="80" />
+            <input name="DisplayOrder" type="number" class="form-control" placeholder="Sıra" value="1" />
+            <button class="btn btn-success" type="submit">Yeni Yetenek Ekle</button>
+        </form>
+        @foreach (var skill in Model.Skills)
+        {
+            <form asp-controller="Admin" asp-action="SaveSkill" method="post" class="admin-edit-card admin-edit-card-compact">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" value="@skill.Id" />
+                <input name="Name" class="form-control" value="@skill.Name" required />
+                <input name="Category" class="form-control" value="@skill.Category" required />
+                <input name="Level" type="number" min="0" max="100" class="form-control" value="@skill.Level" />
+                <input name="DisplayOrder" type="number" class="form-control" value="@skill.DisplayOrder" />
+                <button class="btn btn-primary" type="submit">Kaydet</button>
+                <button type="submit" class="btn btn-danger" formaction="@Url.Action("DeleteSkill", "Admin", new { id = skill.Id })" formmethod="post" formnovalidate>Sil</button>
+            </form>
+        }
+    </div>
+</section>
+
+<section id="certificates" class="card">
+    <div class="card-header"><h3 class="card-title">Sertifikalar</h3></div>
+    <div class="card-body">
+        <form asp-controller="Admin" asp-action="SaveCertificate" method="post" class="admin-inline-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Id" value="0" />
+            <input name="Name" class="form-control" placeholder="Sertifika" required />
+            <input name="Issuer" class="form-control" placeholder="Kurum" required />
+            <input name="DateText" class="form-control" placeholder="Tarih" />
+            <input name="DisplayOrder" type="number" class="form-control" placeholder="Sıra" value="1" />
+            <button class="btn btn-success" type="submit">Yeni Sertifika Ekle</button>
+        </form>
+        @foreach (var certificate in Model.Certificates)
+        {
+            <form asp-controller="Admin" asp-action="SaveCertificate" method="post" class="admin-edit-card admin-edit-card-compact">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" value="@certificate.Id" />
+                <input name="Name" class="form-control" value="@certificate.Name" required />
+                <input name="Issuer" class="form-control" value="@certificate.Issuer" required />
+                <input name="DateText" class="form-control" value="@certificate.DateText" />
+                <input name="DisplayOrder" type="number" class="form-control" value="@certificate.DisplayOrder" />
+                <button class="btn btn-primary" type="submit">Kaydet</button>
+                <button type="submit" class="btn btn-danger" formaction="@Url.Action("DeleteCertificate", "Admin", new { id = certificate.Id })" formmethod="post" formnovalidate>Sil</button>
+            </form>
+        }
+    </div>
+</section>
+
+<section id="projects" class="card">
+    <div class="card-header"><h3 class="card-title">Projeler</h3></div>
+    <div class="card-body">
+        <form asp-controller="Admin" asp-action="SaveProject" method="post" class="admin-inline-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Id" value="0" />
+            <input name="Name" class="form-control" placeholder="Proje" required />
+            <input name="Technologies" class="form-control" placeholder="Teknolojiler" required />
+            <input name="Url" class="form-control" placeholder="Link" />
+            <input name="DisplayOrder" type="number" class="form-control" placeholder="Sıra" value="1" />
+            <textarea name="Description" class="form-control" placeholder="Açıklama" required></textarea>
+            <button class="btn btn-success" type="submit">Yeni Proje Ekle</button>
+        </form>
+        @foreach (var project in Model.Projects)
+        {
+            <form asp-controller="Admin" asp-action="SaveProject" method="post" class="admin-edit-card">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" value="@project.Id" />
+                <input name="Name" class="form-control" value="@project.Name" required />
+                <input name="Technologies" class="form-control" value="@project.Technologies" required />
+                <input name="Url" class="form-control" value="@project.Url" />
+                <input name="DisplayOrder" type="number" class="form-control" value="@project.DisplayOrder" />
+                <textarea name="Description" class="form-control" required>@project.Description</textarea>
+                <button class="btn btn-primary" type="submit">Kaydet</button>
+                <button type="submit" class="btn btn-danger" formaction="@Url.Action("DeleteProject", "Admin", new { id = project.Id })" formmethod="post" formnovalidate>Sil</button>
+            </form>
+        }
+    </div>
+</section>
+
+<section id="social" class="card">
+    <div class="card-header"><h3 class="card-title">Sosyal Medya</h3></div>
+    <div class="card-body">
+        <form asp-controller="Admin" asp-action="SaveSocialLink" method="post" class="admin-inline-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Id" value="0" />
+            <input name="Name" class="form-control" placeholder="Ad" required />
+            <input name="Url" class="form-control" placeholder="Link" required />
+            <input name="IconClass" class="form-control" placeholder="Icon class" required />
+            <input name="DisplayOrder" type="number" class="form-control" placeholder="Sıra" value="1" />
+            <label class="admin-check"><input type="checkbox" name="IsActive" value="true" checked /> Aktif</label>
+            <button class="btn btn-success" type="submit">Yeni Sosyal Medya Ekle</button>
+        </form>
+        @foreach (var socialLink in Model.SocialLinks)
+        {
+            <form asp-controller="Admin" asp-action="SaveSocialLink" method="post" class="admin-edit-card admin-edit-card-compact">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" value="@socialLink.Id" />
+                <input name="Name" class="form-control" value="@socialLink.Name" required />
+                <input name="Url" class="form-control" value="@socialLink.Url" required />
+                <input name="IconClass" class="form-control" value="@socialLink.IconClass" required />
+                <input name="DisplayOrder" type="number" class="form-control" value="@socialLink.DisplayOrder" />
+                <input type="hidden" name="IsActive" value="false" />
+                <label class="admin-check">
+                    <input type="checkbox" name="IsActive" value="true" @(socialLink.IsActive ? "checked" : "") /> Aktif
+                </label>
+                <button class="btn btn-primary" type="submit">Kaydet</button>
+                <button type="submit" class="btn btn-danger" formaction="@Url.Action("DeleteSocialLink", "Admin", new { id = socialLink.Id })" formmethod="post" formnovalidate>Sil</button>
+            </form>
+        }
+    </div>
+</section>
+
+<section id="blog" class="card admin-blog-card">
+    <div class="card-header"><h3 class="card-title">Blog</h3></div>
+    <div class="card-body">
+        <form asp-controller="Admin" asp-action="SaveBlog" method="post" id="blogForm" class="admin-blog-create">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="BlogForm.Id" name="Id" id="BlogForm_Id" />
+            <div class="row">
+                <div class="col-lg-5 form-group">
+                    <label>Başlık</label>
+                    <input asp-for="BlogForm.Title" name="Title" class="form-control" required maxlength="180" />
+                </div>
+                <div class="col-lg-7 form-group">
+                    <label>Özet</label>
+                    <textarea asp-for="BlogForm.Summary" name="Summary" class="form-control" rows="3" required maxlength="500"></textarea>
+                </div>
+                <div class="col-12 form-group">
+                    <label>İçerik</label>
+                    <textarea asp-for="BlogForm.Content" name="Content" class="form-control" rows="8" required maxlength="12000"></textarea>
+                </div>
+            </div>
+            <div class="admin-blog-actions">
+                <div class="custom-control custom-switch">
+                    <input asp-for="BlogForm.IsPublished" name="IsPublished" class="custom-control-input" checked />
+                    <label asp-for="BlogForm.IsPublished" class="custom-control-label">Yayında</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+                <button type="reset" class="btn btn-secondary">Temizle</button>
+            </div>
+        </form>
+
+        <hr />
+
+        <h4 class="admin-section-title">Blog Yazıları</h4>
+        <div class="admin-blog-list">
+            @foreach (var blogPost in Model.BlogPosts)
+            {
+                <form asp-controller="Admin" asp-action="SaveBlog" method="post" class="admin-edit-card admin-blog-edit-card">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@blogPost.Id" />
+                    <div class="form-group">
+                        <label>Başlık</label>
+                        <input name="Title" class="form-control" value="@blogPost.Title" required maxlength="180" />
+                    </div>
+                    <div class="form-group">
+                        <label>Özet</label>
+                        <textarea name="Summary" class="form-control" rows="2" required maxlength="500">@blogPost.Summary</textarea>
+                    </div>
+                    <div class="form-group admin-blog-content-field">
+                        <label>İçerik</label>
+                        <textarea name="Content" class="form-control" rows="5" required maxlength="12000">@blogPost.Content</textarea>
+                    </div>
+                    <input type="hidden" name="IsPublished" value="false" />
+                    <label class="admin-check">
+                        <input type="checkbox" name="IsPublished" value="true" @(blogPost.IsPublished ? "checked" : "") /> Yayında
+                    </label>
+                    <div class="admin-blog-actions">
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                        <button type="submit" class="btn btn-danger" formaction="@Url.Action("DeleteBlog", "Admin", new { id = blogPost.Id })" formmethod="post" formnovalidate>Sil</button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</section>
+
+<section id="messages" class="card">
+    <div class="card-header"><h3 class="card-title">Son Mesajlar</h3></div>
+    <div class="card-body table-responsive p-0">
+        <table class="table table-striped">
+            <thead><tr><th>Gönderen</th><th>Konu</th><th>Tarih</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var message in Model.Messages)
+            {
+                <tr>
+                    <td><strong>@message.FullName</strong><br /><a href="mailto:@message.Email">@message.Email</a></td>
+                    <td><strong>@message.Subject</strong><p class="mb-0">@message.Body</p></td>
+                    <td>@message.CreatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                    <td class="text-right">
+                        <form asp-controller="Admin" asp-action="DeleteMessage" asp-route-id="@message.Id" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-danger" formnovalidate>Sil</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

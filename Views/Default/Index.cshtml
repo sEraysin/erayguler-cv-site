@@ -1,0 +1,338 @@
+@model CvViewModel
+@{
+    Layout = null;
+    var profile = Model.Profile;
+    var groupedSkills = Model.Skills.GroupBy(skill => skill.Category);
+    var initialSection = ViewData["InitialSection"] as string;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Eray Güler - Backend Developer, ASP.NET Core MVC, C#, EF Core, MySQL ve SQL odaklı dinamik CV ve portfolyo sitesi." />
+    <meta name="author" content="Eray Güler" />
+    <title>Eray Güler | Backend Developer</title>
+    <link rel="icon" type="image/x-icon" href="~/startbootstrap-resume-gh-pages/assets/img/favicon.ico" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,600,700" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Muli:400,600,700,800" rel="stylesheet" type="text/css" />
+    <link href="~/startbootstrap-resume-gh-pages/css/styles.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" asp-append-version="true" />
+</head>
+<body id="page-top" class="portfolio-body" data-initial-section="@initialSection">
+    <nav class="navbar navbar-expand-lg portfolio-navbar fixed-top" aria-label="Ana menü">
+        <div class="container">
+            <a class="navbar-brand portfolio-brand" href="#about">
+                <img src="@profile.ImageUrl" alt="" class="brand-avatar" />
+                <span>
+                    <strong>@profile.FirstName @profile.LastName</strong>
+                    <small>@profile.Title</small>
+                </span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#portfolioNav" aria-controls="portfolioNav" aria-expanded="false" aria-label="Menüyü aç">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="portfolioNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item"><a class="nav-link" href="#about">Hakkımda</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#experience">Deneyim</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#skills">Yetenekler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#projects">Projeler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#blog">Blog</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">İletişim</a></li>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <li class="nav-item ms-lg-2">
+                            <a class="btn btn-outline-light btn-sm admin-shortcut" asp-controller="Admin" asp-action="Index">
+                                <i class="fas fa-user-shield me-1"></i>Admin
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="portfolio-hero" id="about">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-9 col-lg-10">
+                        <span class="hero-kicker"><span></span> Backend odaklı yazılım geliştirici</span>
+                        <h1>@profile.FirstName <strong>@profile.LastName</strong></h1>
+                        <p class="hero-title">@profile.Title</p>
+                        <p class="hero-about">@profile.About</p>
+
+                        <div class="hero-contact">
+                            <a href="mailto:@profile.Email"><i class="fas fa-envelope"></i>@profile.Email</a>
+                            <span><i class="fas fa-location-dot"></i>@profile.Location</span>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-3 mt-4">
+                            <a class="btn btn-accent btn-lg" href="#projects">
+                                Projelerimi Gör <i class="fas fa-arrow-down ms-2"></i>
+                            </a>
+                            <a class="btn btn-ghost btn-lg" asp-controller="Default" asp-action="DownloadCv" asp-route-v="@DateTimeOffset.UtcNow.ToUnixTimeSeconds()">
+                                <i class="fas fa-file-arrow-down me-2"></i>CV İndir
+                            </a>
+                        </div>
+
+                        <div class="hero-socials">
+                            @foreach (var link in Model.SocialLinks)
+                            {
+                                <a href="@link.Url" target="_blank" rel="noopener" aria-label="@link.Name" title="@link.Name">
+                                    <i class="@link.IconClass"></i>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="quick-stack" aria-label="Öne çıkan teknolojiler">
+            <div class="container">
+                <div class="stack-strip">
+                    @foreach (var skill in Model.Skills.Take(8))
+                    {
+                        <span>@skill.Name</span>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <section class="portfolio-section" id="experience">
+            <div class="container">
+                <div class="section-heading">
+                    <span>01 / Kariyer</span>
+                    <h2>Deneyim ve eğitim</h2>
+                    <p>Teknik gelişimimi gerçek iş süreçleri ve akademik altyapıyla birlikte ilerletiyorum.</p>
+                </div>
+                <div class="row g-5">
+                    <div class="col-lg-7">
+                        <h3 class="content-column-title"><i class="fas fa-briefcase"></i> Deneyim</h3>
+                        <div class="timeline">
+                            @foreach (var experience in Model.Experiences)
+                            {
+                                <article class="timeline-item">
+                                    <span class="timeline-dot"></span>
+                                    <div class="timeline-date">@experience.DateRange</div>
+                                    <h3>@experience.Title</h3>
+                                    <h4>@experience.Company</h4>
+                                    <p>@experience.Description</p>
+                                </article>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-lg-5" id="education">
+                        <h3 class="content-column-title"><i class="fas fa-graduation-cap"></i> Eğitim</h3>
+                        @foreach (var education in Model.Educations)
+                        {
+                            <article class="education-card">
+                                <span class="education-date">@education.DateRange</span>
+                                <h3>@education.School</h3>
+                                <h4>@education.Degree</h4>
+                                <p class="education-field">@education.Field</p>
+                                @if (!string.IsNullOrWhiteSpace(education.Grade))
+                                {
+                                    <span class="grade-badge">GNO @education.Grade</span>
+                                }
+                                <p>@education.Description</p>
+                            </article>
+                        }
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="portfolio-section section-dark" id="skills">
+            <div class="container">
+                <div class="section-heading light">
+                    <span>02 / Teknik altyapı</span>
+                    <h2>Üretirken kullandığım araçlar</h2>
+                    <p>Backend geliştirmeden veritabanı tasarımına kadar kullandığım teknoloji ve yetkinlikler.</p>
+                </div>
+                <div class="skills-grid">
+                    @foreach (var skillGroup in groupedSkills)
+                    {
+                        <article class="skill-panel">
+                            <h3>@skillGroup.Key</h3>
+                            @foreach (var skill in skillGroup)
+                            {
+                                <div class="skill-row">
+                                    <div>
+                                        <strong>@skill.Name</strong>
+                                        <span>@skill.Level%</span>
+                                    </div>
+                                    <div class="skill-meter" aria-label="@skill.Name seviyesi yüzde @skill.Level">
+                                        <span style="width:@skill.Level%"></span>
+                                    </div>
+                                </div>
+                            }
+                        </article>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <section class="portfolio-section" id="projects">
+            <div class="container">
+                <div class="section-heading heading-row">
+                    <div>
+                        <span>03 / Seçili çalışmalar</span>
+                        <h2>Projeler</h2>
+                    </div>
+                    <p>Öğrendiklerimi gerçek senaryolara dönüştürdüğüm çalışmalar.</p>
+                </div>
+                <div class="project-grid">
+                    @{
+                        var projectNumber = 0;
+                    }
+                    @foreach (var project in Model.Projects)
+                    {
+                        projectNumber++;
+                        <article class="project-card">
+                            <div class="project-number">@projectNumber.ToString("00")</div>
+                            <h3>@project.Name</h3>
+                            <div class="project-tech">@project.Technologies</div>
+                            <p>@project.Description</p>
+                            @if (!string.IsNullOrWhiteSpace(project.Url))
+                            {
+                                <a href="@project.Url" target="_blank" rel="noopener">
+                                    Projeyi görüntüle <i class="fas fa-arrow-up-right-from-square"></i>
+                                </a>
+                            }
+                        </article>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <section class="portfolio-section certificates-section" id="certificates">
+            <div class="container">
+                <div class="section-heading">
+                    <span>04 / Sürekli gelişim</span>
+                    <h2>Sertifikalar</h2>
+                </div>
+                <div class="certificate-list">
+                    @foreach (var certificate in Model.Certificates)
+                    {
+                        <div class="certificate-item">
+                            <i class="fas fa-certificate"></i>
+                            <div>
+                                <strong>@certificate.Name</strong>
+                                <span>@certificate.Issuer</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <section class="portfolio-section blog-preview-section" id="blog">
+            <div class="container">
+                <div class="section-heading heading-row">
+                    <div>
+                        <span>05 / Notlar</span>
+                        <h2>Blog</h2>
+                    </div>
+                    <a class="text-link" asp-controller="Blog" asp-action="Index">Tüm yazıları gör <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="portfolio-blog-grid">
+                    @foreach (var blogPost in Model.LatestBlogPosts)
+                    {
+                        <article class="portfolio-blog-card">
+                            <span>@((blogPost.PublishedAtUtc ?? blogPost.CreatedAtUtc).ToString("dd.MM.yyyy"))</span>
+                            <h3><a asp-controller="Blog" asp-action="Details" asp-route-slug="@blogPost.Slug">@blogPost.Title</a></h3>
+                            <p>@blogPost.Summary</p>
+                            <a class="text-link" asp-controller="Blog" asp-action="Details" asp-route-slug="@blogPost.Slug">Yazıyı oku <i class="fas fa-arrow-right"></i></a>
+                        </article>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <section class="portfolio-section contact-section" id="contact">
+            <div class="container">
+                <div class="row g-5 align-items-start">
+                    <div class="col-lg-5">
+                        <div class="section-heading light">
+                            <span>06 / İletişim</span>
+                            <h2>Birlikte bir şeyler üretelim.</h2>
+                            <p>Proje, staj ve iş fırsatları için bana doğrudan ulaşabilirsin.</p>
+                        </div>
+                        <div class="contact-direct">
+                            <a href="mailto:@profile.Email"><i class="fas fa-envelope"></i>@profile.Email</a>
+                            <a href="tel:@profile.Phone.Replace(" ", "")"><i class="fas fa-phone"></i>@profile.Phone</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-7">
+                        @if (TempData["SuccessMessage"] is string successMessage)
+                        {
+                            <div class="alert alert-success" role="alert">@successMessage</div>
+                        }
+                        @if (TempData["ErrorMessage"] is string errorMessage)
+                        {
+                            <div class="alert alert-danger" role="alert">@errorMessage</div>
+                        }
+                        <form class="contact-card" asp-controller="Default" asp-action="SendMessage" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="ContactForm.FullName" class="form-label">Ad Soyad</label>
+                                    <input asp-for="ContactForm.FullName" name="FullName" class="form-control" />
+                                    <span asp-validation-for="ContactForm.FullName" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="ContactForm.Email" class="form-label">E-posta</label>
+                                    <input asp-for="ContactForm.Email" name="Email" class="form-control" />
+                                    <span asp-validation-for="ContactForm.Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="ContactForm.Subject" class="form-label">Konu</label>
+                                <input asp-for="ContactForm.Subject" name="Subject" class="form-control" />
+                                <span asp-validation-for="ContactForm.Subject" class="text-danger"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label asp-for="ContactForm.Body" class="form-label">Mesaj</label>
+                                <textarea asp-for="ContactForm.Body" name="Body" class="form-control" rows="5"></textarea>
+                                <span asp-validation-for="ContactForm.Body" class="text-danger"></span>
+                            </div>
+                            <button type="submit" class="btn btn-accent btn-lg w-100">Mesaj Gönder <i class="fas fa-paper-plane ms-2"></i></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="portfolio-footer">
+        <div class="container d-flex flex-column flex-sm-row justify-content-between gap-2">
+            <span>© @DateTime.Now.Year @profile.FirstName @profile.LastName</span>
+            <a href="#page-top">Yukarı dön <i class="fas fa-arrow-up"></i></a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        window.addEventListener("DOMContentLoaded", () => {
+            const sectionId = document.body.dataset.initialSection;
+            if (sectionId) {
+                document.getElementById(sectionId)?.scrollIntoView({ block: "start" });
+            }
+
+            const menu = document.getElementById("portfolioNav");
+            document.querySelectorAll("#portfolioNav a[href^='#']").forEach(link => {
+                link.addEventListener("click", () => {
+                    if (menu?.classList.contains("show")) {
+                        bootstrap.Collapse.getOrCreateInstance(menu).hide();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

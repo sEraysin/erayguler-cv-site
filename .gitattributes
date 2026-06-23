@@ -1,0 +1,5 @@
+*.scss linguist-vendored
+*.css linguist-vendored
+*.js linguist-vendored
+*.map linguist-vendored
+**/wwwroot/lib/** linguist-vendored

@@ -1,0 +1,23 @@
+@model BlogPost
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<article class="blog-detail">
+    <div class="container">
+        <a asp-controller="Blog" asp-action="Index" class="blog-back-link">Blog'a dön</a>
+
+        <header class="blog-detail-header">
+            <span class="blog-eyebrow">@((Model.PublishedAtUtc ?? Model.CreatedAtUtc).ToLocalTime().ToString("dd.MM.yyyy"))</span>
+            <h1>@Model.Title</h1>
+            <p>@Model.Summary</p>
+        </header>
+
+        <div class="blog-content">
+            @foreach (var paragraph in Model.Content.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries))
+            {
+                <p>@paragraph</p>
+            }
+        </div>
+    </div>
+</article>
